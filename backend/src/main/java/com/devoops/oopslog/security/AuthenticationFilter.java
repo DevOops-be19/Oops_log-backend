@@ -1,0 +1,165 @@
+package com.devoops.oopslog.security;
+
+
+import com.devoops.oopslog.common.SseService;
+import com.devoops.oopslog.member.command.dto.LoginDTO;
+import com.devoops.oopslog.member.command.dto.UserImpl;
+import com.devoops.oopslog.member.command.service.MemberCommandService;
+import com.devoops.oopslog.member.command.service.MemberCommandServiceImpl;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import io.jsonwebtoken.Claims;
+import io.jsonwebtoken.Jwts;
+import io.jsonwebtoken.SignatureAlgorithm;
+import io.jsonwebtoken.security.Keys;
+import jakarta.servlet.FilterChain;
+import jakarta.servlet.ServletException;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.core.env.Environment;
+import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.authentication.BadCredentialsException;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.AuthenticationException;
+import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
+
+import java.io.IOException;
+import java.net.InetAddress;
+import java.net.UnknownHostException;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.stream.Collectors;
+
+@Slf4j
+public class AuthenticationFilter extends UsernamePasswordAuthenticationFilter {
+
+    private final Environment env;
+    private final MemberCommandService memberCommandService;
+
+    public AuthenticationFilter(AuthenticationManager authenticationManager,
+                                Environment env,
+                                MemberCommandService memberCommandService) {
+        // authenticationManager를 인지시킴
+        super(authenticationManager);
+        this.env = env;
+        this.memberCommandService = memberCommandService;
+    }
+
+
+    @Override
+    public Authentication attemptAuthentication(HttpServletRequest request, HttpServletResponse response) throws AuthenticationException {
+        try {
+            LoginDTO credential = new ObjectMapper().readValue(request.getInputStream(), LoginDTO.class);
+
+            return getAuthenticationManager().authenticate(
+                    new UsernamePasswordAuthenticationToken(credential.getMember_id(), credential.getMember_pw(), new ArrayList<>()));
+        } catch (IOException e) {
+            log.info("attemptAuthentication 에서 오류");
+            throw new RuntimeException(e);
+        }
+    }
+
+    @Override
+    protected void successfulAuthentication(HttpServletRequest request, HttpServletResponse response, FilterChain chain, Authentication authResult) throws IOException, ServletException {
+        log.info("로그인 성공 : {}", authResult.toString());
+        // 성공한 사용자의 id
+        String id = authResult.getName();
+        log.info(id);
+
+        // 사용자의 권한 목록
+        List<String> roles = authResult.getAuthorities().stream()
+//                .map(role->role.getAuthority())
+                .map(GrantedAuthority::getAuthority)
+                .collect(Collectors.toList());
+        log.info("List<String> 형태로 뽑아낸 로그인 한 회원의 권한들 : {}", roles);
+
+        // JWT 토큰 발행
+        Claims claims = Jwts.claims().setSubject(id);
+        claims.put("auth", roles);
+
+        String token = Jwts.builder()
+                .setClaims(claims)
+                .setExpiration(new java.util.Date(System.currentTimeMillis() + Long.parseLong(env.getProperty(("token.expiration_time")))))
+                .signWith(SignatureAlgorithm.HS512, env.getProperty("token.secret"))
+                .compact();
+
+//        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+        log.info("token : {}", token);
+        response.addHeader("token", token);
+
+        // 성공 객체 반환
+        UserImpl user = (UserImpl) authResult.getPrincipal();
+        response.setStatus(HttpServletResponse.SC_OK);
+        response.setContentType("application/json;charset=UTF-8");
+        response.getWriter().write("{");
+        response.getWriter().write("\"success\": \"로그인 성공\",");
+        response.getWriter().write("\"id\": \"" + user.getId() + "\"");
+        response.getWriter().write("}");
+
+        // 로그인 이력 저장
+        String ipAddress = getClientIp(request);
+        memberCommandService.saveLoginHistory(user.getId(), ipAddress, 'Y');
+    }
+
+
+    @Override
+    protected void unsuccessfulAuthentication(HttpServletRequest request, HttpServletResponse response, AuthenticationException failed) throws IOException, ServletException {
+        log.info("로그인 인증 실패 : {}", failed.toString());
+        // 인증 실패 응답
+        response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+        response.setContentType("application/json;charset=UTF-8");
+        response.getWriter().write("{\"error\": \"" + failed.getMessage() + "\"}");
+
+        if (failed instanceof BadCredentialsException) {
+            // 로그인 이력 저장
+            Long id = Long.parseLong(failed.getMessage().split(",")[1]);
+            String ipAddress = getClientIp(request);
+            memberCommandService.saveLoginHistory(id, ipAddress, 'N');      // 실패했을때 비밀번호 불일치 Exception 일 시 실패한 id 값을 이력에 저장
+        }
+//        super.unsuccessfulAuthentication(request, response, failed);
+
+    }
+
+    public static String getClientIp(HttpServletRequest request) throws UnknownHostException {
+        String ip = request.getHeader("X-Forwarded-For");
+
+        if (ip == null || ip.isBlank() || "unknown".equalsIgnoreCase(ip)) {
+            ip = request.getHeader("Proxy-Client-IP");
+        }
+        if (ip == null || ip.isBlank() || "unknown".equalsIgnoreCase(ip)) {
+            ip = request.getHeader("WL-Proxy-Client-IP");
+        }
+        if (ip == null || ip.isBlank() || "unknown".equalsIgnoreCase(ip)) {
+            ip = request.getHeader("HTTP_CLIENT_IP");
+        }
+        if (ip == null || ip.isBlank() || "unknown".equalsIgnoreCase(ip)) {
+            ip = request.getHeader("HTTP_X_FORWARDED_FOR");
+        }
+        if (ip == null || ip.isBlank() || "unknown".equalsIgnoreCase(ip)) {
+            ip = request.getHeader("X-Real-IP");
+        }
+        if (ip == null || ip.isBlank() || "unknown".equalsIgnoreCase(ip)) {
+            ip = request.getHeader("X-RealIP");
+        }
+        if (ip == null || ip.isBlank() || "unknown".equalsIgnoreCase(ip)) {
+            ip = request.getHeader("REMOTE_ADDR");
+        }
+        if (ip == null || ip.isBlank() || "unknown".equalsIgnoreCase(ip)) {
+            ip = request.getRemoteAddr(); // fallback
+        }
+
+        // X-Forwarded-For는 콤마로 여러 IP가 들어올 수 있음 → 첫 번째가 클라이언트
+        if (ip != null && ip.contains(",")) {
+            ip = ip.split(",")[0].trim();
+        }
+        if (ip.equals("0:0:0:0:0:0:0:1")) {
+            InetAddress inet = InetAddress.getLocalHost();
+            ip = inet.getHostAddress();
+        }
+
+        return ip;
+    }
+}

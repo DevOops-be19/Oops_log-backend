@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.devoops.oopslog.bookmark.query.mapper.BookmarkQueryMapper">
+
+    <select id="findBookmarksByUserId" resultType="com.devoops.oopslog.bookmark.query.dto.BookmarkItemDto">
+        (
+            -- Ooh 북마크 조회
+            SELECT
+                b.id AS bookmarkId,
+                'ooh' AS recordType,
+                ooh.id AS recordId,
+                ooh.title,
+                LEFT(ooh.content, 100) AS contentSnippet,
+                ooh.create_date AS createDate,
+                m.name AS authorName
+            FROM bookmark b
+                JOIN ooh_record ooh ON b.ooh_id = ooh.id
+                JOIN member m ON ooh.user_id = m.id
+            WHERE b.user_id = #{userId} AND b.ooh_id IS NOT NULL
+        )
+
+        UNION ALL
+
+        (
+            -- Oops 북마크 조회
+            SELECT
+                b.id AS bookmarkId,
+                'oops' AS recordType,
+                oops.id AS recordId,
+                oops.title,
+                LEFT(oops.content, 100) AS contentSnippet,
+                oops.create_date AS createDate,
+                m.name AS authorName
+            FROM bookmark b
+                JOIN oops_record oops ON b.oops_id = oops.id
+                JOIN member m ON oops.user_id = m.id
+            WHERE b.user_id = #{userId} AND b.oops_id IS NOT NULL
+        )
+
+        -- 북마크한 순서(최신순)로 정렬
+        ORDER BY bookmarkId DESC
+    </select>
+
+</mapper>

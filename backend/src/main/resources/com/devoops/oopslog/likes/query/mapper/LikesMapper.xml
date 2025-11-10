@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "https://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.devoops.oopslog.likes.query.mapper.LikesMapper">
+    <select id="countOopsLikes" parameterType="int" resultType="int">
+        SELECT COUNT(*)
+          FROM likes A
+         WHERE A.OOPS_ID = #{oopsId}
+    </select>
+    <select id="countOohLikes" parameterType="int" resultType="int">
+        SELECT COUNT(*)
+        FROM likes A
+        WHERE A.OOH_ID = #{oohId}
+    </select>
+</mapper>

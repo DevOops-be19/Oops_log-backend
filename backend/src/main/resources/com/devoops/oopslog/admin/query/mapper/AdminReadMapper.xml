@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "https://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.devoops.oopslog.admin.query.mapper.AdminReadMapper">
+    <select id="selectAllMember" resultType="com.devoops.oopslog.admin.query.dto.AllMemberDTO">
+        SELECT * FROM member
+        ORDER BY id DESC
+        <if test="limit != null and offset != null">
+            LIMIT #{limit} OFFSET #{offset}
+        </if>
+    </select>
+    <select id="selectAllTag" resultType="com.devoops.oopslog.admin.query.dto.AllTagDTO">
+        SELECT * FROM tag
+    </select>
+</mapper>

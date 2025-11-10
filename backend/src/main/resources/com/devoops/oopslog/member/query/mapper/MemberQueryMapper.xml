@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.devoops.oopslog.member.query.mapper.MemberQueryMapper">
+    <resultMap id="findMemberByIdResultMap" type="com.devoops.oopslog.member.query.dto.FindMemberDTO">
+        <id property="id" column="id"/>
+        <result property="memberId" column="member_id"/>
+        <result property="email" column="email"/>
+        <result property="user_state" column="user_state"/>
+    </resultMap>
+    <select id="findMemberById" parameterType="com.devoops.oopslog.member.query.dto.FindIdDTO" resultMap="findMemberByIdResultMap">
+        SELECT
+               a.id
+             , a.member_id
+             , a.email
+             , a.user_state
+          FROM member a
+         WHERE a.email = #{email}
+           AND a.name = #{name}
+           AND a.birth = #{birth}
+    </select>
+    <select id="findMemberPwById" parameterType="com.devoops.oopslog.member.query.dto.FindPwDTO" resultMap="findMemberByIdResultMap">
+        SELECT
+            a.id
+             , a.member_id
+             , a.email
+             , a.user_state
+        FROM member a
+        WHERE a.email = #{email}
+          AND a.name = #{name}
+          AND a.birth = #{birth}
+    </select>
+
+
+</mapper>

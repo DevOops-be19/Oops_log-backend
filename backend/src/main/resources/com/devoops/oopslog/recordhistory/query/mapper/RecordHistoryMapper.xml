@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "https://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.devoops.oopslog.recordhistory.query.mapper.RecordHistoryMapper">
+    <resultMap id="getRecordHistoryMap" type="com.devoops.oopslog.recordhistory.query.dto.RequestRecordHistoryDTO">
+        <id property="id" column="ID"/>
+        <result property="count_date" column="COUNT_DATE"/>
+        <result property="record_count" column="RECORD_COUNT"/>
+    </resultMap>
+    <select id="dailyCountOopsByUser" resultMap="getRecordHistoryMap" parameterType="long">
+        SELECT
+               A.ID,
+               DATE(A.COUNT_DATE) AS COUNT_DATE,
+               A.RECORD_COUNT
+          FROM record_history A
+         WHERE A.USER_ID = #{userId} AND A.RECORD_TYPE = 'P'
+         GROUP BY DATE(count_date)
+    </select>
+</mapper>

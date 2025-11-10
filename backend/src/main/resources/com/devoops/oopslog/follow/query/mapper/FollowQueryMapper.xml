@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.devoops.oopslog.follow.query.mapper.FollowQueryMapper">
+
+    <select id="findFolloweesByUserId" resultType="com.devoops.oopslog.follow.query.dto.FollowerResponseDto">
+        SELECT
+            m.id,
+            m.member_id,
+            m.name
+        FROM member m
+                 JOIN follow f ON m.id = f.followee_id
+        WHERE f.follower_id = #{userId}
+    </select>
+
+    <select id="findFollowersByUserId" resultType="com.devoops.oopslog.follow.query.dto.FollowerResponseDto">
+        SELECT
+            m.id,
+            m.member_id,
+            m.name
+        FROM member m
+                 JOIN follow f ON m.id = f.follower_id
+        WHERE f.followee_id = #{userId}
+    </select>
+
+</mapper>

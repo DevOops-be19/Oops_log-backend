@@ -1,0 +1,62 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "https://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.devoops.oopslog.achivement.query.mapper.AchivementReadMapper">
+    <select id="selectDailyUserOopsRecord" resultType="com.devoops.oopslog.achivement.query.dto.OopsRecordCountDTO">
+        SELECT
+        DAY(create_date) AS day,
+        COUNT(*) AS oops_count
+        FROM oops_record
+        WHERE user_id = #{userId}
+        AND YEAR(create_date) = #{year}
+        AND MONTH(create_date) = #{month}
+        GROUP BY DAY(create_date)
+        ORDER BY day ASC
+    </select>
+    <select id="selectDailyUserOohRecord" resultType="com.devoops.oopslog.achivement.query.dto.OohRecordCountDTO">
+        SELECT
+        DAY(create_date) AS day,
+        COUNT(*) AS ooh_count
+        FROM ooh_record
+        WHERE user_id = #{userId}
+        AND YEAR(create_date) = #{year}
+        AND MONTH(create_date) = #{month}
+        GROUP BY DAY(create_date)
+        ORDER BY day ASC
+    </select>
+    <select id="selectTopOopsTag" resultType="com.devoops.oopslog.achivement.query.dto.TagCountDTO">
+        SELECT
+        t.tag_name AS tag_name,
+        COUNT(*) AS tag_count
+        FROM oops_tag ot
+        INNER JOIN oops_record o ON ot.oops_id = o.id
+        INNER JOIN tag t ON ot.tag_id = t.id
+        WHERE o.user_id = #{userId}
+        GROUP BY t.id, t.tag_name
+        ORDER BY tag_count DESC
+        LIMIT 5
+    </select>
+    <select id="selectTopOohTag" resultType="com.devoops.oopslog.achivement.query.dto.TagCountDTO">
+        SELECT
+        t.tag_name AS tag_name,
+        COUNT(*) AS tag_count
+        FROM ooh_tag ot
+        INNER JOIN ooh_record o ON ot.ooh_id = o.id
+        INNER JOIN tag t ON ot.tag_id = t.id
+        WHERE o.user_id = #{userId}
+        GROUP BY t.id, t.tag_name
+        ORDER BY tag_count DESC
+        LIMIT 5
+    </select>
+    <select id="countOopsRecord" resultType="int">
+        SELECT COUNT(*) AS oops_count
+        FROM oops_record
+        WHERE user_id = #{userId}
+    </select>
+    <select id="countOohRecord" resultType="int">
+        SELECT COUNT(*) AS ooh_count
+        FROM ooh_record
+        WHERE user_id = #{userId}
+    </select>
+</mapper>

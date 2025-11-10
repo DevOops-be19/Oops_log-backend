@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "https://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.devoops.oopslog.report.query.mapper.ReportReadMapper">
+    <select id="selectAllReport" resultType="com.devoops.oopslog.report.query.dto.AllReportDTO">
+        SELECT * FROM report
+        ORDER BY id
+        <if test="limit != null and offset != null">
+            LIMIT #{limit} OFFSET #{offset}
+        </if>
+    </select>
+
+    <select id="selectReportDetail" resultType="com.devoops.oopslog.report.query.dto.ReportDetailDTO">
+        SELECT
+            r.id,
+            r.state,
+            r.user_id,
+            COALESCE(ooh.user_id, oops.user_id, c.user_id) AS target_id,
+            COALESCE(ooh.content, oops.content, c.content) AS target_content
+        FROM report r
+        LEFT JOIN ooh_record ooh
+        ON r.ooh_id IS NOT NULL AND r.ooh_id = ooh.id
+        LEFT JOIN oops_record oops
+        ON r.oops_id IS NOT NULL AND r.oops_id = oops.id
+        LEFT JOIN comments c
+        ON r.comment_id IS NOT NULL AND r.comment_id = c.id
+        WHERE r.id = #{reportId}
+    </select>
+</mapper>

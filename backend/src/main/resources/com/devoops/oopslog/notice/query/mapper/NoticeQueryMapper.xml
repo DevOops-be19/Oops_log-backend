@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.devoops.oopslog.notice.query.mapper.NoticeQueryMapper">
+
+    <resultMap id="NoticeMap" type="com.devoops.oopslog.notice.query.dto.NoticeQueryDTO">
+        <id     property="noticeId"         column="ID"/>
+        <result property="noticeTitle"      column="TITLE"/>
+        <result property="noticeContent"    column="CONTENT"/>
+        <result property="noticeCreateDate" column="CREATE_DATE"/>
+        <result property="noticeModifyDate" column="MODIFY_DATE"/>
+        <result property="noticeIsDeleted"  column="IS_DELETED"/>
+        <result property="noticeUserId"     column="USER_ID"/>
+        <result property="name"             column="NAME"/>
+    </resultMap>
+
+    <select id="selectNoticeList" resultType="com.devoops.oopslog.notice.query.dto.NoticeQueryDTO">
+        SELECT
+            A.ID AS noticeId,
+            A.TITLE AS noticeTitle,
+            A.CONTENT AS noticeContent,
+            A.CREATE_DATE AS noticeCreateDate,
+            A.MODIFY_DATE AS noticeModifyDate,
+            A.IS_DELETED AS noticeIsDeleted,
+            B.NAME
+        FROM notice_board A
+        JOIN member B ON A.USER_ID = B.ID
+        <where>
+            <if test="title != null and title != ''">
+                AND A.TITLE LIKE CONCAT('%', #{title}, '%')
+            </if>
+            <if test="content != null and content != ''">
+                AND A.CONTENT LIKE CONCAT('%', #{content}, '%')
+            </if>
+        </where>
+        ORDER BY A.ID DESC
+        LIMIT #{limit} OFFSET #{offset}
+    </select>
+
+
+    <select id="selectNoticeCount" resultType="int">
+        SELECT COUNT(*)
+        FROM notice_board A
+        <where>
+            <if test="title != null and title != ''">
+                AND A.title LIKE CONCAT('%', #{title}, '%')
+            </if>
+            <if test="content != null and content != ''">
+                AND A.content LIKE CONCAT('%', #{content}, '%')
+            </if>
+        </where>
+    </select>
+</mapper>

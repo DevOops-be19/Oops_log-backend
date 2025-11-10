@@ -1,0 +1,80 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.devoops.oopslog.oops.query.mapper.OopsQueryMapper">
+    <resultMap id="OopsMap" type="com.devoops.oopslog.oops.query.dto.OopsQueryDTO">
+        <id property="oopsId" column="ID"/>
+        <result property="oopsIsPrivate" column="IS_PRIVATE"/>
+        <result property="oopsTitle" column="TITLE"/>
+        <result property="oopsContent" column="CONTENT"/>
+        <result property="oopsAIAnswer" column="AI_ANSWER"/>
+        <result property="oopsCreateDate" column="CREATE_DATE"/>
+        <result property="oopsModifyDate" column="MODIFY_DATE"/>
+        <result property="oopsIsDeleted" column="IS_DELETED"/>
+        <result property="oopsUserId" column="USER_ID"/>
+        <result property="name" column="NAME"/>
+
+        <!-- tagIds: 부모 셀렉트의 oohId 값을 파라미터로 넘겨 하위조회 -->
+        <collection property="tagIds"
+                    ofType="java.lang.Long"
+                    column="ID"
+                    select="selectTagIdsByOopsId"/>
+    </resultMap>
+
+    <select id="selectOopsList" resultMap="OopsMap">
+        SELECT
+            A.ID,
+            A.IS_PRIVATE,
+            A.TITLE,
+            A.CONTENT,
+            A.AI_ANSWER,
+            A.CREATE_DATE,
+            A.MODIFY_DATE,
+            A.IS_DELETED,
+            A.USER_ID,
+            B.NAME
+        FROM oops_record A
+        JOIN member B ON A.user_id = B.ID
+        <where>
+            <if test="title != null and title != ''">
+                AND A.TITLE LIKE CONCAT('%', #{title}, '%')
+            </if>
+            <if test="content != null and content != ''">
+                AND A.CONTENT LIKE CONCAT('%', #{content}, '%')
+            </if>
+            <if test="name != null and name != ''">
+                AND B.NAME LIKE CONCAT('%', #{name}, '%')
+            </if>
+        </where>
+        ORDER BY A.ID DESC
+        LIMIT #{limit} OFFSET #{offset}
+    </select>
+
+    <select id="selectOopsCount" resultType="int">
+        SELECT COUNT(*)
+        FROM oops_record A
+        JOIN member B ON A.user_id = B.ID
+        <where>
+            <if test="title != null and title != ''">
+            AND A.title LIKE CONCAT('%', #{title}, '%')
+            </if>
+            <if test="content != null and content != ''">
+            AND A.content LIKE CONCAT('%', #{content}, '%')
+            </if>
+            <if test="name != null and name != ''">
+            AND B.NAME LIKE CONCAT('%', #{name}, '%')
+            </if>
+        </where>
+    </select>
+
+
+    <!-- 태그 ID 조회 LIMIT 써서 3개만 들어가게 함 -->
+    <select id="selectTagIdsByOopsId" resultType="long">
+        SELECT T.TAG_ID
+        FROM oops_tag T
+        WHERE T.OOPS_ID = #{oopsId}
+        ORDER BY T.TAG_ID
+        LIMIT 3
+    </select>
+</mapper>
