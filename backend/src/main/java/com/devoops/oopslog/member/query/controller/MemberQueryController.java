@@ -6,12 +6,15 @@ import com.devoops.oopslog.member.query.dto.FindPwResponseDTO;
 import com.devoops.oopslog.member.query.dto.FindIdDTO;
 import com.devoops.oopslog.member.query.service.MemberQueryService;
 import jakarta.mail.MessagingException;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
 
+import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 
+@Slf4j
 @RestController
 @RequestMapping("/member")
 public class MemberQueryController {
