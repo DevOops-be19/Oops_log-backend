@@ -14,12 +14,10 @@ import org.springframework.web.filter.OncePerRequestFilter;
 import java.io.IOException;
 
 @Slf4j
-@Component
 public class JwtFilter extends OncePerRequestFilter {
 
     private final JwtUtil jwtUtil;
 
-    @Autowired
     public  JwtFilter(JwtUtil jwtUtil) {
         this.jwtUtil = jwtUtil;
     }
