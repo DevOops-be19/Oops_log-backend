@@ -45,6 +45,7 @@ public class WebSecurity {
     protected SecurityFilterChain configure(HttpSecurity http) throws Exception {
         /* 설명. Spring Security 모듈 추가 후 default 로그인 페이지 제거 및 인가 설정 */
         http.csrf(csrf -> csrf.disable());
+        // oops 게시물, ooh 게시물, 공지사항, 로그인, 회원가입, 메인페이지
         http.authorizeHttpRequests(authz ->
                                    authz.requestMatchers("/**").permitAll()
                                         .requestMatchers(HttpMethod.GET, "/health").permitAll()

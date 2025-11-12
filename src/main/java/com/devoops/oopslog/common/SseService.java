@@ -43,16 +43,17 @@ public class SseService {
         sseRepository.delete(id);
     }
 
-    public void sseSend(Long id, String message)  {
+    public void sseSend(Long id, String message) {
         // SseEmitter 생성
         SseEmitter emitter = sseRepository.get(id);
 
         // 만약 구독되어있는 id가 없으면 return
+        if (emitter == null) return;
+
         try {
             emitter.send(SseEmitter.event().data(message));
         } catch (IOException e) {
-            throw new RuntimeException("일치하는 회원 정보가 없습니다. " + e.getMessage());
+            throw new RuntimeException(e);
         }
-
     }
 }

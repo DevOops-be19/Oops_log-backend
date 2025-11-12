@@ -3,8 +3,11 @@ package com.devoops.oopslog.member.command.service;
 import com.devoops.oopslog.member.command.dto.*;
 import com.devoops.oopslog.member.command.entity.LoginHistory;
 import com.devoops.oopslog.member.command.entity.Member;
+import com.devoops.oopslog.member.command.entity.UserAuth;
 import com.devoops.oopslog.member.command.repository.LoginHistoryCommandRepository;
 import com.devoops.oopslog.member.command.repository.MemberCommandRepository;
+import com.devoops.oopslog.member.command.repository.UserAuthCommandRepository;
+import com.devoops.oopslog.member.query.service.MemberQueryService;
 import lombok.extern.slf4j.Slf4j;
 import org.modelmapper.ModelMapper;
 import org.modelmapper.convention.MatchingStrategies;
@@ -22,10 +25,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
-import java.util.UUID;
+import java.util.*;
 
 @Service
 @Slf4j
@@ -35,16 +35,22 @@ public class MemberCommandServiceImpl implements MemberCommandService {
     private final BCryptPasswordEncoder bCryptPasswordEncoder;
     private final ModelMapper modelMapper;
     private final RedisTemplate<String, String> redisTemplate;
+    private final UserAuthCommandRepository userAuthCommandRepository;
+    private final MemberQueryService memberQueryService;
 
     public MemberCommandServiceImpl(MemberCommandRepository memberCommandRepository,
                                     BCryptPasswordEncoder bCryptPasswordEncoder,
                                     ModelMapper modelMapper, RedisTemplate<String, String> redisTemplate,
-                                    LoginHistoryCommandRepository loginHistoryCommandRepository) {
+                                    LoginHistoryCommandRepository loginHistoryCommandRepository,
+                                    UserAuthCommandRepository userAuthCommandRepository,
+                                    MemberQueryService memberQueryService) {
         this.memberCommandRepository = memberCommandRepository;
         this.bCryptPasswordEncoder = bCryptPasswordEncoder;
         this.modelMapper = modelMapper;
         this.redisTemplate = redisTemplate;
         this.loginHistoryCommandRepository = loginHistoryCommandRepository;
+        this.userAuthCommandRepository = userAuthCommandRepository;
+        this.memberQueryService = memberQueryService;
     }
 
     @Override
@@ -57,10 +63,20 @@ public class MemberCommandServiceImpl implements MemberCommandService {
         Member member = modelMapper.map(signUpDTO, Member.class);
         member.setUser_state('A');
         member.setSign_up_date(now.format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss")));
-
+        if(memberCommandRepository.existsByMemberId(member.getMemberId())){
+            throw new RuntimeException("이미 존재하는 회원 아이디 입니다.");
+        }
+        if(memberCommandRepository.existsByEmail(member.getEmail())){
+            throw new RuntimeException("이미 존재하는 이메일 입니다.");
+        }
         member.setMemberPw(bCryptPasswordEncoder.encode(member.getMemberPw()));
 
-        memberCommandRepository.save(member);
+        memberCommandRepository.saveAndFlush(member);
+
+        // user_auth에 데이터 저장
+        Long userId = member.getId();
+        UserAuth userAuth = new UserAuth(userId,2L);
+        userAuthCommandRepository.save(userAuth);
     }
 
     @Override
@@ -138,22 +154,37 @@ public class MemberCommandServiceImpl implements MemberCommandService {
         Member member = memberCommandRepository.findByMemberId(username);
 
         // 존재하지 않는 아이디
-        if (member == null) throw new UsernameNotFoundException(username + " - 회원정보가 존재하지 않음");
+        if (member == null) throw new UsernameNotFoundException("회원정보가 존재하지 않습니다.");
 
         // 정지된 회원
-        if (member.getUser_state() == 'S') throw new LockedException(username + " - 정지된 회원");
+        if (member.getUser_state() == 'S') throw new LockedException("정지된 회원입니다.");
 
         // 5회 이상 로그인 시도
 
 
         // 회원 권한 꺼내기
         List<GrantedAuthority> grantedAuthorities = new ArrayList<>();
-        grantedAuthorities.add(new SimpleGrantedAuthority("ROLE_USER"));
+        List<Map<String, String>> authList = memberQueryService.getAuthList(member.getId());
+        log.info(authList.toString());
+        authList.forEach(userAuth->{
+            grantedAuthorities.add(new SimpleGrantedAuthority(userAuth.get("auth_name").toString()));
+        });
+
+
 //        grantedAuthorities.add(new SimpleGrantedAuthority("ROLE_ADMIN"));
 
         // 커스텀한 User 객체 이용
         UserImpl userImpl = new UserImpl(member.getMemberId(), member.getMemberPw(), grantedAuthorities);
-        userImpl.setUserInfo(new UserDetailInfoDTO(member.getId()));
+        userImpl.setUserInfo(new UserDetailInfoDTO(
+                member.getId(),
+                member.getMemberId(),
+                member.getEmail(),
+                member.getName(),
+                member.getBirth(),
+                member.getGender(),
+                member.getSign_up_date()
+        ));
+
         return userImpl;
         // 사용자의 id,pw,권한,하위 정보들을 provider로 전송
 //        return new User(member.getMemberId(), member.getMemberPw(), true, true, true, true, grantedAuthorities);

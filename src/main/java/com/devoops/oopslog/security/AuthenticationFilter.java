@@ -30,7 +30,9 @@ import java.io.IOException;
 import java.net.InetAddress;
 import java.net.UnknownHostException;
 import java.util.ArrayList;
+import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 @Slf4j
@@ -53,6 +55,7 @@ public class AuthenticationFilter extends UsernamePasswordAuthenticationFilter {
     public Authentication attemptAuthentication(HttpServletRequest request, HttpServletResponse response) throws AuthenticationException {
         try {
             LoginDTO credential = new ObjectMapper().readValue(request.getInputStream(), LoginDTO.class);
+            log.info("attemptAuthentication: credential={}", credential);
 
             return getAuthenticationManager().authenticate(
                     new UsernamePasswordAuthenticationToken(credential.getMember_id(), credential.getMember_pw(), new ArrayList<>()));
@@ -92,12 +95,25 @@ public class AuthenticationFilter extends UsernamePasswordAuthenticationFilter {
 
         // 성공 객체 반환
         UserImpl user = (UserImpl) authResult.getPrincipal();
+        Map<String, Object> responseBody = new LinkedHashMap<>();
+        responseBody.put("success", "로그인 성공");
+        responseBody.put("id", user.getId());
+        responseBody.put("memberId", user.getMemberId());
+        responseBody.put("email", user.getEmail());
+        responseBody.put("name", user.getName());
+        responseBody.put("birth", user.getBirth());
+        responseBody.put("gender", user.getGender());
+        responseBody.put("signUpDate", user.getSignUpDate());
+        responseBody.put("roles", roles);
+
+        // Jackson으로 JSON 변환
+        ObjectMapper mapper = new ObjectMapper();
+        String json = mapper.writeValueAsString(responseBody);
+
         response.setStatus(HttpServletResponse.SC_OK);
+        response.setCharacterEncoding("UTF-8");
         response.setContentType("application/json;charset=UTF-8");
-        response.getWriter().write("{");
-        response.getWriter().write("\"success\": \"로그인 성공\",");
-        response.getWriter().write("\"id\": \"" + user.getId() + "\"");
-        response.getWriter().write("}");
+        response.getWriter().write(json);
 
         // 로그인 이력 저장
         String ipAddress = getClientIp(request);
@@ -111,13 +127,16 @@ public class AuthenticationFilter extends UsernamePasswordAuthenticationFilter {
         // 인증 실패 응답
         response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
         response.setContentType("application/json;charset=UTF-8");
-        response.getWriter().write("{\"error\": \"" + failed.getMessage() + "\"}");
 
         if (failed instanceof BadCredentialsException) {
             // 로그인 이력 저장
+            response.getWriter().write("{\"error\": \"" + failed.getMessage().split(",")[0] + "\"}");
             Long id = Long.parseLong(failed.getMessage().split(",")[1]);
             String ipAddress = getClientIp(request);
             memberCommandService.saveLoginHistory(id, ipAddress, 'N');      // 실패했을때 비밀번호 불일치 Exception 일 시 실패한 id 값을 이력에 저장
+        }
+        else{
+            response.getWriter().write("{\"error\": \"" + failed.getMessage() + "\"}");
         }
 //        super.unsuccessfulAuthentication(request, response, failed);
 

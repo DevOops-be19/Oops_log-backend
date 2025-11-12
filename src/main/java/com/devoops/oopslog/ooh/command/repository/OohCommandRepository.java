@@ -7,12 +7,13 @@ import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
 import java.time.LocalDate;
+import java.util.List;
 
 // JpaRepository<OohCommandEntity, 이부분> 뒤에는 PK가 들어가야함
 public interface OohCommandRepository extends JpaRepository<OohCommandEntity, Long> {
 
-    @Query("SELECT COUNT(o) FROM OohCommandEntity o " +
-            "WHERE o.oohUserId = :userId " +
-            "AND FUNCTION('DATE', o.oohCreateDate) = :date")
-    int countByUserIdAndDate(@Param("userId") Long userId, @Param("date") LocalDate date);
+    @Query(value = "SELECT DATE(create_date) AS date, COUNT(*) AS count " +
+            "FROM ooh_record WHERE user_id = :userId AND is_deleted = 'N' GROUP BY DATE(create_date)",
+            nativeQuery = true)
+    List<Object[]> countPostsByUserGroupByDate(@Param("userId") Long userId);
 }

@@ -1,6 +1,7 @@
 package com.devoops.oopslog.oops.query.service;
 
 import com.devoops.oopslog.oops.query.dto.OopsQueryDTO;
+import com.devoops.oopslog.oops.query.dto.OopsQuerySelectDTO;
 import com.devoops.oopslog.oops.query.mapper.OopsQueryMapper;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -26,5 +27,11 @@ public class OopsQueryService {
 
     public int selectOopsCount(String title, String name, String content) {
         return oopsQueryMapper.selectOopsCount(title, name, content);
+    }
+
+    public OopsQuerySelectDTO selectOopsById(Long oopsId) {
+        OopsQuerySelectDTO oopsRecord = oopsQueryMapper.selectOopsRecordByOopsId(oopsId);
+
+        return oopsRecord;
     }
 }

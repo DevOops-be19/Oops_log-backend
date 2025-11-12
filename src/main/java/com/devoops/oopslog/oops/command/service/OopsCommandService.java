@@ -58,7 +58,7 @@ public class OopsCommandService {
         entity.setOopsUserId(oopsCommandCreateDTO.getOopsUserId());
         entity.setOopsTitle(oopsCommandCreateDTO.getOopsTitle());
         entity.setOopsContent(oopsCommandCreateDTO.getOopsContent());
-
+        entity.setOopsAIAnswer(oopsCommandCreateDTO.getOopsAIAnswer());
         entity.setOopsIsPrivate(oopsCommandCreateDTO.getOopsIsPrivate()
                 != null ? oopsCommandCreateDTO.getOopsIsPrivate() : "N");
         entity.setOopsCreateDate(oopsCommandCreateDTO.getOopsCreateDate());
@@ -82,6 +82,20 @@ public class OopsCommandService {
                 OopsTag oopsTag = new OopsTag();
                 oopsTag.setOopsTagPK(oopsTagPK);
 
+                oopsTagRepository.save(oopsTag);
+            }
+        }
+
+        // === 4️⃣ 감정 태그 저장 (emoTagNames: ["우울","슬픔","걱정"]) ===
+        if (oopsCommandCreateDTO.getEmoTagIds() != null && !oopsCommandCreateDTO.getEmoTagIds().isEmpty()) {
+            List<String> emoTagNames = oopsCommandCreateDTO.getEmoTagIds();
+            // ① 태그 이름으로 id 조회
+            List<Long> emoTagIds = tagRepository.findIdsByTagName(emoTagNames);
+            // ② 조회된 태그 id를 oops_tag 테이블에 저장
+            for (Long emoTagId : emoTagIds) {
+                OopsTagPK pk = new OopsTagPK(emoTagId, saved.getOopsId());
+                OopsTag oopsTag = new OopsTag();
+                oopsTag.setOopsTagPK(pk);
                 oopsTagRepository.save(oopsTag);
             }
         }

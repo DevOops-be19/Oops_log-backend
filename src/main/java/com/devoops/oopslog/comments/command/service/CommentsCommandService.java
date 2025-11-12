@@ -12,4 +12,6 @@ public interface CommentsCommandService {
     String modifyComment(String content, int commentId);
 
     String deleteComment(int commentId);
+
+    String hardDeleteComment(int commentId);
 }

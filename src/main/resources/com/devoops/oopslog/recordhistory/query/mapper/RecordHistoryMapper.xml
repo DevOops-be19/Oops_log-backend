@@ -15,6 +15,13 @@
                A.RECORD_COUNT
           FROM record_history A
          WHERE A.USER_ID = #{userId} AND A.RECORD_TYPE = 'P'
-         GROUP BY DATE(count_date)
+    </select>
+    <select id="dailyCountOohByUser" resultMap="getRecordHistoryMap" parameterType="long">
+        SELECT
+        A.ID,
+        DATE(A.COUNT_DATE) AS COUNT_DATE,
+        A.RECORD_COUNT
+        FROM record_history A
+        WHERE A.USER_ID = #{userId} AND A.RECORD_TYPE = 'H'
     </select>
 </mapper>

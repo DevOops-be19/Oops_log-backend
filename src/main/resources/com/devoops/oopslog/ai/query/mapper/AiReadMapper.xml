@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "https://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.devoops.oopslog.ai.query.mapper.AiReadMapper">
+    <select id="emoTag" resultType="String">
+        SELECT tag_name FROM tag WHERE tag_type = 'EMO'
+    </select>
+</mapper>

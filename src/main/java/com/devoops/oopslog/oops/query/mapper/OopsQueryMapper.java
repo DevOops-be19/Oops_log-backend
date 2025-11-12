@@ -1,6 +1,7 @@
 package com.devoops.oopslog.oops.query.mapper;
 
 import com.devoops.oopslog.oops.query.dto.OopsQueryDTO;
+import com.devoops.oopslog.oops.query.dto.OopsQuerySelectDTO;
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
 
@@ -24,4 +25,6 @@ public interface OopsQueryMapper {
 
     //  oopsId로 태그 id 목록 조회
     List<Long> selectTagIdsByOopsId(@Param("oopsId") Long oopsId);
+
+    OopsQuerySelectDTO selectOopsRecordByOopsId(Long oopsId);
 }

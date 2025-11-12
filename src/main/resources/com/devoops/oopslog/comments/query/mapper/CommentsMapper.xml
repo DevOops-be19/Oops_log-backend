@@ -43,7 +43,7 @@
              , A.IS_DELETED
              , A.USER_ID
              , A.NOTICE_ID
-          FROM comment A
+          FROM comments A
          WHERE A.NOTICE_ID = #{notice_id}
     </select>
 </mapper>

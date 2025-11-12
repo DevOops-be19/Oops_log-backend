@@ -31,6 +31,14 @@
           AND a.name = #{name}
           AND a.birth = #{birth}
     </select>
+    <select id="getAuthList" parameterType="_long" resultType="map">
+        SELECT
+               c.auth_name
+          FROM user_auth a
+          JOIN member b ON a.user_id = b.id
+          JOIN auth_list c ON a.auth_id = c.id
+         WHERE a.user_id = #{userId}
+    </select>
 
 
 </mapper>

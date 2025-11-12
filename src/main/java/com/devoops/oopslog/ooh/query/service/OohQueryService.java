@@ -1,6 +1,7 @@
 package com.devoops.oopslog.ooh.query.service;
 
 import com.devoops.oopslog.ooh.query.dto.OohQueryDTO;
+import com.devoops.oopslog.ooh.query.dto.OohQuerySelectDTO;
 import com.devoops.oopslog.ooh.query.mapper.OohQueryMapper;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -30,4 +31,9 @@ public class OohQueryService {
     }
 
 
+    public OohQuerySelectDTO selectOohById(Long oohId) {
+        OohQuerySelectDTO oohRecord = oohQueryMapper.selectOohRecordByOohId(oohId);
+
+        return oohRecord;
+    }
 }

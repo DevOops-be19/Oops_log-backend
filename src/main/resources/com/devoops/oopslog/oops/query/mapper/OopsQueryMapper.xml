@@ -77,4 +77,33 @@
         ORDER BY T.TAG_ID
         LIMIT 3
     </select>
+
+    <resultMap id="getOopsMap" type="com.devoops.oopslog.oops.query.dto.OopsQuerySelectDTO">
+        <id property="id" column="ID"/>
+        <result property="is_private" column="IS_PRIVATE"/>
+        <result property="title" column="TITLE"/>
+        <result property="content" column="CONTENT"/>
+        <result property="ai_answer" column="AI_ANSWER"/>
+        <result property="create_date" column="CREATE_DATE"/>
+        <result property="modify_date" column="MODIFY_DATE"/>
+        <result property="is_deleted" column="IS_DELETED"/>
+        <result property="user_id" column="USER_ID"/>
+        <result property="user_name" column="NAME"/>
+    </resultMap>
+    <select id="selectOopsRecordByOopsId" resultMap="getOopsMap" parameterType="long">
+        SELECT
+            A.ID
+             , A.IS_PRIVATE
+             , A.TITLE
+             , A.CONTENT
+             , A.AI_ANSWER
+             , A.CREATE_DATE
+             , A.MODIFY_DATE
+             , A.IS_DELETED
+             , A.USER_ID
+             , B.NAME
+        FROM oops_record A
+                 JOIN member B ON A.USER_ID = B.ID
+        WHERE A.ID = #{oopsId}
+    </select>
 </mapper>

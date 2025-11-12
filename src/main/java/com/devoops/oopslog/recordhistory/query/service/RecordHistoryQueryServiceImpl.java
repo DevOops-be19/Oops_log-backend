@@ -23,4 +23,12 @@ public class RecordHistoryQueryServiceImpl implements RecordHistoryQueryService 
 
         return recordHistoryList;
     }
+
+    @Override
+    public List<RequestRecordHistoryDTO> getOohCalendarStats(long userId) {
+        List<RequestRecordHistoryDTO> recordHistoryList =
+                recordHistoryMapper.dailyCountOohByUser(userId);
+
+        return recordHistoryList;
+    }
 }

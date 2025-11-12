@@ -1,0 +1,93 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.devoops.oopslog.ooh.query.mapper.OohDetailMapper">
+
+    <!-- 부모 기본정보 -->
+    <resultMap id="OohDetailMap" type="com.devoops.oopslog.ooh.query.dto.OohDetailDTO">
+        <id     property="id"         column="ID"/>
+        <result property="type"       column="TYPE"/>
+        <result property="title"      column="TITLE"/>
+        <result property="content"    column="CONTENT"/>
+        <result property="isPrivate"  column="IS_PRIVATE"/>
+        <result property="createDate" column="CREATE_DATE"/>
+        <result property="modifyDate" column="MODIFY_DATE"/>
+        <result property="userId"     column="USER_ID"/>
+        <result property="userName"   column="NAME"/>
+
+        <!-- 컬렉션/단일 값들은 서비스에서 세팅하는 쪽이 안전하지만,
+             필요하면 아래처럼 nested select도 가능 -->
+    </resultMap>
+
+    <select id="selectOohBaseById" resultMap="OohDetailMap" parameterType="long">
+        SELECT
+            A.ID,
+            'ooh' AS TYPE,
+            A.TITLE,
+            A.CONTENT,
+            A.IS_PRIVATE,
+            A.CREATE_DATE,
+            A.MODIFY_DATE,
+            A.USER_ID,
+            M.NAME
+        FROM ooh_record A
+                 JOIN member M ON M.ID = A.USER_ID
+        WHERE A.ID = #{oohId}
+          AND A.IS_DELETED = 'N'
+            LIMIT 1
+    </select>
+
+    <!-- 태그 3개까지 -->
+    <select id="selectTagNamesByOohId" resultType="string" parameterType="long">
+        SELECT T.TAG_NAME
+        FROM ooh_tag OT
+                 JOIN tag T ON T.ID = OT.TAG_ID
+        WHERE OT.OOH_ID = #{oohId}
+        ORDER BY T.TAG_NAME
+            LIMIT 3
+    </select>
+
+    <!-- 감정 태그(있으면) 3개까지 -->
+    <select id="selectEmotionNamesByOohId" resultType="string" parameterType="long">
+        SELECT T.TAG_NAME
+        FROM ooh_tag OT
+        JOIN tag T ON T.ID = OT.TAG_ID
+        WHERE OT.OOH_ID = #{oohId}
+        AND T.TAG_TYPE = 'EMOTION'   <!-- 태그 타입 컬럼이 있다면, 실제 스키마에 맞춰 수정 -->
+        ORDER BY T.TAG_NAME
+        LIMIT 3
+    </select>
+
+    <!-- 좋아요 카운트 -->
+    <select id="selectLikesCountByOohId" resultType="long" parameterType="long">
+        SELECT COUNT(*) FROM likes
+        WHERE ooh_id = #{oohId}
+    </select>
+
+    <!-- 댓글 상위 N개 -->
+    <resultMap id="OohDetailCommentMap" type="com.devoops.oopslog.ooh.query.dto.OohDetailCommentDTO">
+        <id     property="id"        column="ID"/>
+        <result property="author"    column="AUTHOR"/>
+        <result property="content"   column="CONTENT"/>
+        <result property="createdAt" column="CREATE_DATE"/>
+    </resultMap>
+
+    <select id="selectCommentsByOohId" resultMap="OohDetailCommentMap">
+        SELECT
+            C.ID,
+            '익명' AS AUTHOR,        -- 항상 익명 표기
+            C.CONTENT,
+            C.CREATE_DATE
+        FROM comments C
+        WHERE C.OOH_ID = #{oohId}
+          AND C.IS_DELETED = 'N'
+        ORDER BY C.ID DESC
+            LIMIT #{limit}
+    </select>
+
+    <select id="selectCommentsTotal" resultType="long" parameterType="long">
+        SELECT COUNT(*) FROM comments
+        WHERE OOH_ID = #{oohId}
+          AND IS_DELETED = 'N'
+    </select>
+</mapper>

@@ -9,5 +9,5 @@ import lombok.*;
 @ToString
 public class TagNameDTO {
     private Long id;
-    private Long tag_name;
+    private String tag_name;
 }

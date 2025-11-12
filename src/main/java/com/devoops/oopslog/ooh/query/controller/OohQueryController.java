@@ -1,15 +1,15 @@
 package com.devoops.oopslog.ooh.query.controller;
 
+import com.devoops.oopslog.ooh.query.dto.OohDetailDTO;
 import com.devoops.oopslog.ooh.query.dto.OohQueryDTO;
 import com.devoops.oopslog.ooh.query.dto.OohQueryScrollResponseDTO;
+import com.devoops.oopslog.ooh.query.dto.OohQuerySelectDTO;
+import com.devoops.oopslog.ooh.query.service.OohDetailService;
 import com.devoops.oopslog.ooh.query.service.OohQueryService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
@@ -18,10 +18,12 @@ import java.util.List;
 @RequestMapping("/ooh")
 public class OohQueryController {
     private final OohQueryService oohQueryService;
+    private final OohDetailService oohDetailService;
 
     @Autowired
-    public OohQueryController(OohQueryService oohQueryService) {
+    public OohQueryController(OohQueryService oohQueryService, OohDetailService service, OohDetailService oohDetailService) {
         this.oohQueryService = oohQueryService;
+        this.oohDetailService = oohDetailService;
     }
     // 무한 스크롤 + 검색 기반 조회
     @GetMapping("/all")
@@ -53,5 +55,24 @@ public class OohQueryController {
         return ResponseEntity.ok(response);
     }
 
+    @GetMapping("/{ooh_id}")
+    public ResponseEntity<OohQuerySelectDTO> selectOohRecordById(@PathVariable Long ooh_id) {
+        OohQuerySelectDTO oohRecord = oohQueryService.selectOohById(ooh_id);
+
+        return ResponseEntity.ok().body(oohRecord);
+    }
+
+
+
+    @GetMapping("/{oohId}/detail")
+    public ResponseEntity<OohDetailDTO> getDetail(
+            @PathVariable Long oohId,
+            @RequestParam(defaultValue = "10") int commentLimit
+            /*, @AuthenticationPrincipal JwtUser me */) {
+
+        OohDetailDTO dto = oohDetailService.getDetail(oohId, commentLimit /*, me != null ? me.getId() : null*/);
+        if (dto == null) return ResponseEntity.notFound().build();
+        return ResponseEntity.ok(dto);
+    }
 
 }

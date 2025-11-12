@@ -8,12 +8,14 @@ import com.devoops.oopslog.ooh.command.repository.OohCommandRepository;
 import com.devoops.oopslog.oops.command.entity.OopsCommandEntity;
 import com.devoops.oopslog.oops.command.repository.OopsCommandRepository;
 import jakarta.transaction.Transactional;
+import lombok.extern.slf4j.Slf4j;
 import org.modelmapper.ModelMapper;
 import org.modelmapper.convention.MatchingStrategies;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 @Service
+@Slf4j
 public class LikesCommandServiceImpl implements LikesCommandService {
     private final LikesRepository likesRepository;
     private final OopsCommandRepository oopsCommandRepository;
@@ -33,16 +35,17 @@ public class LikesCommandServiceImpl implements LikesCommandService {
     @Override
     @Transactional
     public String createOrDeleteLikesByOopsId(int oopsId, long userId) {
-        OopsCommandEntity oops = oopsCommandRepository.findById((long)oopsId).get();
 
-        Likes likes = likesRepository.findByOopsId(oops.getOopsId());
+        log.info("좋아요 등록 및 삭제 시 기록 ID 확인: {}", oopsId);
+        Likes likes = likesRepository.findByOopsId((long)oopsId);
         if (likes != null && likes.getUser_id() == userId) {
             likesRepository.delete(likes);
             return "likes deleted";
         } else {
 
             LikesDTO likesDTO = new LikesDTO();
-            likesDTO.setOops_id((long)oopsId);
+            log.info("좋아요 등록 시 기록 ID 확인: {}", oopsId);
+            likesDTO.setOopsId((long)oopsId);
             likesDTO.setUser_id(userId);
 
             modelMapper.getConfiguration().setMatchingStrategy(MatchingStrategies.STRICT);
@@ -56,16 +59,15 @@ public class LikesCommandServiceImpl implements LikesCommandService {
     @Override
     @Transactional
     public String createOrDeleteLikesByOohId(int oohId, long userId) {
-        OohCommandEntity ooh = oohCommandRepository.findById((long)oohId).get();
 
-        Likes likes = likesRepository.findByOohId(ooh.getOohId());
+        Likes likes = likesRepository.findByOohId((long)oohId);
         if (likes != null && likes.getUser_id() == userId) {
             likesRepository.delete(likes);
             return "likes deleted";
         } else {
 
             LikesDTO likesDTO = new LikesDTO();
-            likesDTO.setOoh_id((long)oohId);
+            likesDTO.setOohId((long)oohId);
             likesDTO.setUser_id(userId);
 
             modelMapper.getConfiguration().setMatchingStrategy(MatchingStrategies.STRICT);

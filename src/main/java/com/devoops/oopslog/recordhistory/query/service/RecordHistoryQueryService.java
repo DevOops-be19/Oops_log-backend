@@ -6,4 +6,6 @@ import java.util.List;
 
 public interface RecordHistoryQueryService {
     List<RequestRecordHistoryDTO> getOopsCalendarStats(long userId);
+
+    List<RequestRecordHistoryDTO> getOohCalendarStats(long userId);
 }

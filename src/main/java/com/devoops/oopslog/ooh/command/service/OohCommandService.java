@@ -10,6 +10,7 @@ import com.devoops.oopslog.tag.command.entity.OohTagPK;
 import com.devoops.oopslog.tag.command.entity.OopsTag;
 import com.devoops.oopslog.tag.command.entity.OopsTagPK;
 import com.devoops.oopslog.tag.command.repository.OohTagRepository;
+import com.devoops.oopslog.tag.command.repository.TagRepository;
 import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -28,6 +29,7 @@ public class OohCommandService {
     private final OohCommandRepository oohCommandRepository;
     private final MemberCommandRepository memberCommandRepository;
     private final OohTagRepository oohTagRepository;
+    private final TagRepository tagRepository;
 
     @Transactional
     public OohCommandCreateDTO insertOoh(OohCommandCreateDTO oohCommandCreateDTO) {
@@ -57,6 +59,7 @@ public class OohCommandService {
 
         entity.setOohIsPrivate(oohCommandCreateDTO.getOohIsPrivate()
                 !=null ? oohCommandCreateDTO.getOohIsPrivate() : "N");
+        entity.setOohAIAnswer(oohCommandCreateDTO.getOohAIAnswer());
         entity.setOohCreateDate(oohCommandCreateDTO.getOohCreateDate());
         entity.setOohModifyDate(oohCommandCreateDTO.getOohModifyDate());
 
@@ -77,6 +80,21 @@ public class OohCommandService {
                 OohTag oohTag = new OohTag();
                 oohTag.setOohTagPK(oohTagPK);
 
+                oohTagRepository.save(oohTag);
+            }
+        }
+
+        // ===== 감정 태그 저장 (relatedTags: ["우울","슬픔","걱정"]) =====
+        if (oohCommandCreateDTO.getEmoTagIds() != null && !oohCommandCreateDTO.getEmoTagIds().isEmpty()) {
+            List<String> relatedTags = oohCommandCreateDTO.getEmoTagIds();
+
+            // 1️⃣ 태그 이름 목록으로 id 조회
+            List<Long> emoTagIds = tagRepository.findIdsByTagName(relatedTags);
+            // 2️⃣ 조회된 태그 id를 ooh_tag에 저장
+            for (Long emoTagId : emoTagIds) {
+                OohTagPK oohTagPK = new OohTagPK(emoTagId, saved.getOohId());
+                OohTag oohTag = new OohTag();
+                oohTag.setOohTagPK(oohTagPK);
                 oohTagRepository.save(oohTag);
             }
         }

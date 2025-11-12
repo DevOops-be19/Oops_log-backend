@@ -28,13 +28,13 @@
                A.ID
              , A.TAG_NAME
           FROM tag A
-         WHERE A.TAG_TYPE = 'P'
+         WHERE A.TAG_TYPE = 'oops'
     </select>
     <select id="selectOohTag" resultMap="getTagMap">
         SELECT
                A.ID
              , A.TAG_NAME
           FROM tag A
-         WHERE A.TAG_TYPE = 'H'
+         WHERE A.TAG_TYPE = 'ooh'
     </select>
 </mapper>

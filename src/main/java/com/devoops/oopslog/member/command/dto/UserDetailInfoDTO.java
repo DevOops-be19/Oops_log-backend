@@ -9,4 +9,10 @@ import lombok.*;
 @ToString
 public class UserDetailInfoDTO {
     private Long id;
+    private String memberId;
+    private String email;
+    private String name;
+    private String birth;
+    private Character gender;
+    private String signUpDate;
 }

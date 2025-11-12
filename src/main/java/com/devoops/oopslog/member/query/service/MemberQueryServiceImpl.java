@@ -15,6 +15,9 @@ import org.springframework.mail.javamail.MimeMessageHelper;
 import org.springframework.stereotype.Service;
 
 import java.io.UnsupportedEncodingException;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
 import java.util.Random;
 import java.util.concurrent.TimeUnit;
 
@@ -110,6 +113,10 @@ public class MemberQueryServiceImpl implements MemberQueryService {
             throw e;
         }
         return null;
+    }
+
+    public List<Map<String, String>> getAuthList(Long userId){
+        return memberQueryMapper.getAuthList(userId);
     }
 
     private String randomNum() {

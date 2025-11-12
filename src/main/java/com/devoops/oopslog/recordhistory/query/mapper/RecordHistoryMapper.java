@@ -8,4 +8,6 @@ import java.util.List;
 @Mapper
 public interface RecordHistoryMapper {
     List<RequestRecordHistoryDTO> dailyCountOopsByUser(long userId);
+
+    List<RequestRecordHistoryDTO> dailyCountOohByUser(long userId);
 }
