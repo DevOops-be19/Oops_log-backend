@@ -3,6 +3,8 @@ package com.devoops.oopslog.comments.command.service;
 import com.devoops.oopslog.comments.command.dto.CommentCommandDTO;
 import com.devoops.oopslog.comments.command.entity.Comments;
 import com.devoops.oopslog.comments.command.repository.CommentsRepository;
+import com.devoops.oopslog.oops.command.entity.OopsCommandEntity;
+import com.devoops.oopslog.oops.command.repository.OopsCommandRepository;
 import jakarta.transaction.Transactional;
 import lombok.extern.slf4j.Slf4j;
 import org.modelmapper.ModelMapper;
@@ -16,11 +18,14 @@ import java.time.LocalDateTime;
 public class CommentsCommandServiceImpl implements CommentsCommandService {
     private final CommentsRepository commentsRepository;
     private final ModelMapper modelMapper;
+    private final OopsCommandRepository oopsCommandRepository;
 
     @Autowired
-    public CommentsCommandServiceImpl(CommentsRepository commentsRepository, ModelMapper modelMapper) {
+    public CommentsCommandServiceImpl(CommentsRepository commentsRepository, ModelMapper modelMapper,
+                                      OopsCommandRepository oopsCommandRepository) {
         this.commentsRepository = commentsRepository;
         this.modelMapper = modelMapper;
+        this.oopsCommandRepository = oopsCommandRepository;
     }
 
 
@@ -35,7 +40,10 @@ public class CommentsCommandServiceImpl implements CommentsCommandService {
         comments.setOops_id((long)oopsId);
 
         commentsRepository.save(comments);
-        return "oops comment write success";
+
+        OopsCommandEntity oopsCommandEntity =  oopsCommandRepository.findById((long)oopsId).get();
+
+        return oopsCommandEntity.getOopsUserId()+"";
     }
 
     @Override

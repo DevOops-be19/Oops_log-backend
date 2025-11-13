@@ -1,6 +1,10 @@
-package com.devoops.oopslog.ooh.query.dto;
+package com.devoops.oopslog.oops.query.dto;
 
-import lombok.*;
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
+
 import java.time.LocalDateTime;
 import java.util.List;
 
@@ -8,10 +12,10 @@ import java.util.List;
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-public class OohDetailDTO {
+public class OopsDetailDTO {
 
     private Long id;
-    private String type; // "ooh" 고정
+    private String type;
     private String title;
     private String content;
     private String isPrivate;
@@ -27,6 +31,6 @@ public class OohDetailDTO {
     private long likesCount;
     private boolean likedByMe;       // 당분간 false 고정
 
-    private List<OohDetailCommentDTO> comments;
+    private List<OopsDetailCommentDTO> comments;
     private long commentsTotal;
 }

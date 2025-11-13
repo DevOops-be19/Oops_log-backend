@@ -1,5 +1,6 @@
 package com.devoops.oopslog.ooh.query.service;
 
+import com.devoops.oopslog.ooh.query.dto.OohMemIdDTO;
 import com.devoops.oopslog.ooh.query.dto.OohQueryDTO;
 import com.devoops.oopslog.ooh.query.dto.OohQuerySelectDTO;
 import com.devoops.oopslog.ooh.query.mapper.OohQueryMapper;
@@ -35,5 +36,9 @@ public class OohQueryService {
         OohQuerySelectDTO oohRecord = oohQueryMapper.selectOohRecordByOohId(oohId);
 
         return oohRecord;
+    }
+
+    public List<OohMemIdDTO> selectOohRecordByMemId(Long id){
+        return oohQueryMapper.selectOohRecordByMemId(id);
     }
 }

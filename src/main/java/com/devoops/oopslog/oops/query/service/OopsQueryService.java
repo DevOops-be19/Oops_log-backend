@@ -1,5 +1,6 @@
 package com.devoops.oopslog.oops.query.service;
 
+import com.devoops.oopslog.oops.query.dto.OopsMemById;
 import com.devoops.oopslog.oops.query.dto.OopsQueryDTO;
 import com.devoops.oopslog.oops.query.dto.OopsQuerySelectDTO;
 import com.devoops.oopslog.oops.query.mapper.OopsQueryMapper;
@@ -33,5 +34,9 @@ public class OopsQueryService {
         OopsQuerySelectDTO oopsRecord = oopsQueryMapper.selectOopsRecordByOopsId(oopsId);
 
         return oopsRecord;
+    }
+
+    public List<OopsMemById> selectOopsRecordByMemId(Long id) {
+        return oopsQueryMapper.selectOopsRecordByMemId(id);
     }
 }

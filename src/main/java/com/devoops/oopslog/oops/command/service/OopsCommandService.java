@@ -29,7 +29,6 @@ public class OopsCommandService {
 
     private final OopsCommandRepository oopsCommandRepository;
     private final MemberCommandRepository memberCommandRepository;
-    private final OohTagRepository oohTagRepository;
     private final OopsTagRepository oopsTagRepository;
     private final TagRepository tagRepository;
 

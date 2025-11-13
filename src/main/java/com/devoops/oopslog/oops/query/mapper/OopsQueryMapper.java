@@ -1,5 +1,6 @@
 package com.devoops.oopslog.oops.query.mapper;
 
+import com.devoops.oopslog.oops.query.dto.OopsMemById;
 import com.devoops.oopslog.oops.query.dto.OopsQueryDTO;
 import com.devoops.oopslog.oops.query.dto.OopsQuerySelectDTO;
 import org.apache.ibatis.annotations.Mapper;
@@ -27,4 +28,6 @@ public interface OopsQueryMapper {
     List<Long> selectTagIdsByOopsId(@Param("oopsId") Long oopsId);
 
     OopsQuerySelectDTO selectOopsRecordByOopsId(Long oopsId);
+
+    List<OopsMemById> selectOopsRecordByMemId(@Param("id") Long id);
 }

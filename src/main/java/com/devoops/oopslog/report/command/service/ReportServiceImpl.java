@@ -20,7 +20,7 @@ import java.util.Date;
 
 @Service
 @Transactional
-public class ReportSerivceImpl implements ReportService {
+public class ReportServiceImpl implements ReportService {
 
     private final ReportRepository reportRepository;
     private final MemberCommandRepository memberRepository;
@@ -30,7 +30,7 @@ public class ReportSerivceImpl implements ReportService {
     private final CommentsRepository commentsRepository;
 
     @Autowired
-    public ReportSerivceImpl(ReportRepository reportRepository,
+    public ReportServiceImpl(ReportRepository reportRepository,
                              MemberCommandRepository memberRepository,
                              ReportCategoryRepository reportCategoryRepository,
                              OohCommandRepository oohCommandRepository,

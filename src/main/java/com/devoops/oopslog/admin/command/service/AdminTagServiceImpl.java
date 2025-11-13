@@ -10,14 +10,14 @@ import java.util.List;
 
 @Service
 @Transactional
-public class TagServiceImpl implements TagService {
+public class AdminTagServiceImpl implements AdminTagService {
     private final TagRepository tagRepository;
 
     // 허용 가능한 태그 타입 목록
     private static final List<String> ALLOWED_TAG_TYPES = List.of("ooh", "oops", "emo");
 
     @Autowired
-    public TagServiceImpl(TagRepository tagRepository) {
+    public AdminTagServiceImpl(TagRepository tagRepository) {
         this.tagRepository = tagRepository;
     }
 

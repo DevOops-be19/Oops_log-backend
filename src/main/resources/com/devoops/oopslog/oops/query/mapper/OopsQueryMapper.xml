@@ -106,4 +106,13 @@
                  JOIN member B ON A.USER_ID = B.ID
         WHERE A.ID = #{oopsId}
     </select>
+    <select id="selectOopsRecordByMemId" resultType="com.devoops.oopslog.oops.query.dto.OopsMemById">
+        SELECT
+            A.id
+             , A.title
+             , A.content
+        FROM oops_record A
+                 JOIN member B ON A.user_id = B.id
+        WHERE B.id = #{id}
+    </select>
 </mapper>

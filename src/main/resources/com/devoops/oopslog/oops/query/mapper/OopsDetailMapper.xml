@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
         "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
-<mapper namespace="com.devoops.oopslog.ooh.query.mapper.OohDetailMapper">
+<mapper namespace="com.devoops.oopslog.oops.query.mapper.OopsDetailMapper">
 
-    <resultMap id="OohDetailMap" type="com.devoops.oopslog.ooh.query.dto.OohDetailDTO">
+    <resultMap id="OopsDetailMap" type="com.devoops.oopslog.oops.query.dto.OopsDetailDTO">
         <id    property="id"         column="id"/>
         <result property="isPrivate" column="is_private"/>
         <result property="title"     column="title"/>
@@ -17,7 +17,7 @@
         <result property="likesCount" column="likes_count"/>
     </resultMap>
 
-    <select id="selectOohBaseById" resultMap="OohDetailMap" parameterType="long">
+    <select id="selectOopsBaseById" resultMap="OopsDetailMap" parameterType="long">
         SELECT
         A.ID,
         A.TITLE,
@@ -28,55 +28,55 @@
         A.MODIFY_DATE,
         A.USER_ID,
         M.NAME AS user_name
-        FROM ooh_record A
+        FROM oops_record A
         JOIN member M ON M.ID = A.USER_ID
-        WHERE A.ID = #{oohId}
+        WHERE A.ID = #{oopsId}
         AND A.IS_DELETED = 'N'
         LIMIT 1
     </select>
 
     <!-- 일반 태그 3개: 감정이 아닌 것 -->
-    <select id="selectTagNamesByOohId" resultType="string" parameterType="long">
+    <select id="selectTagNamesByOopsId" resultType="string" parameterType="long">
         SELECT T.TAG_NAME
-        FROM ooh_tag OT
+        FROM oops_tag OT
         JOIN tag T ON T.ID = OT.TAG_ID
-        WHERE OT.OOH_ID = #{oohId}
+        WHERE OT.OOps_ID = #{oopsId}
         AND UPPER(T.TAG_TYPE) NOT IN ('EMOTION', 'EMO')   <!-- ✅ CATEGORY → TAG_TYPE, 대소문자 무시 -->
         ORDER BY T.TAG_NAME
         LIMIT 3
     </select>
 
     <!-- 감정 태그 3개 -->
-    <select id="selectEmotionNamesByOohId" resultType="string" parameterType="long">
+    <select id="selectEmotionNamesByOopsId" resultType="string" parameterType="long">
         SELECT T.TAG_NAME
-        FROM ooh_tag OT
+        FROM oops_tag OT
         JOIN tag T ON T.ID = OT.TAG_ID
-        WHERE OT.OOH_ID = #{oohId}
+        WHERE OT.OOps_ID = #{oopsId}
         AND UPPER(T.TAG_TYPE) IN ('EMOTION', 'EMO')       <!-- ✅ CATEGORY → TAG_TYPE, 대소문자 무시 -->
         ORDER BY T.TAG_NAME
         LIMIT 3
     </select>
 
-    <select id="selectLikesCountByOohId" resultType="long" parameterType="long">
-        SELECT COUNT(*) FROM likes WHERE ooh_id = #{oohId}
+    <select id="selectLikesCountByOopsId" resultType="long" parameterType="long">
+        SELECT COUNT(*) FROM likes WHERE oops_id = #{oopsId}
     </select>
 
     <!-- 댓글 상위 N개 -->
-    <resultMap id="OohDetailCommentMap" type="com.devoops.oopslog.ooh.query.dto.OohDetailCommentDTO">
+    <resultMap id="OopsDetailCommentMap" type="com.devoops.oopslog.oops.query.dto.OopsDetailCommentDTO">
         <id     property="id"        column="ID"/>
         <result property="author"    column="AUTHOR"/>
         <result property="content"   column="CONTENT"/>
         <result property="createdAt" column="CREATE_DATE"/>
     </resultMap>
 
-    <select id="selectCommentsByOohId" resultMap="OohDetailCommentMap">
+    <select id="selectCommentsByOopsId" resultMap="OopsDetailCommentMap">
         SELECT
             C.ID,
             '익명' AS AUTHOR,        -- 항상 익명 표기
             C.CONTENT,
             C.CREATE_DATE
         FROM comments C
-        WHERE C.OOH_ID = #{oohId}
+        WHERE C.OOPS_ID = #{oopsId}
           AND C.IS_DELETED = 'N'
         ORDER BY C.ID DESC
             LIMIT #{limit}
@@ -84,7 +84,7 @@
 
     <select id="selectCommentsTotal" resultType="long" parameterType="long">
         SELECT COUNT(*) FROM comments
-        WHERE OOH_ID = #{oohId}
+        WHERE OOPS_ID = #{oopsId}
           AND IS_DELETED = 'N'
     </select>
 </mapper>

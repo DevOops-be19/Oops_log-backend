@@ -36,8 +36,8 @@ public class BookmarkCommandService {
      * 북마크 추가 C (JPA)
      */
     @Transactional
-    public void addBookmark(BookmarkRequestDto request) {
-        Long userId = request.getUserId();
+    public void addBookmark(Long userId, BookmarkRequestDto request) {
+//        Long userId = request.getUserId();
         Long recordId = request.getRecordId();
         String recordType = request.getRecordType();
 
@@ -77,8 +77,8 @@ public class BookmarkCommandService {
      * 북마크 삭제 D (JPA)
      */
     @Transactional
-    public void removeBookmark(BookmarkRequestDto request) {
-        Long userId = request.getUserId();
+    public void removeBookmark(Long userId, BookmarkRequestDto request) {
+//        Long userId = request.getUserId();
         Long recordId = request.getRecordId();
         String recordType = request.getRecordType();
 
@@ -100,7 +100,7 @@ public class BookmarkCommandService {
             throw new IllegalArgumentException("유효하지 않은 레코드 타입입니다. 'ooh' 또는 'oops'여야 합니다.");
         }
 
-        log.info("북마크 삭제 성공 : userId={}, type={}, recordId={}",
+        log.info("북마크 삭제 성공     : userId={}, type={}, recordId={}",
                 userId, recordType, recordId);
     }
 }

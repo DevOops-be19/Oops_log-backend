@@ -25,7 +25,7 @@
         GROUP BY DAY(create_date)
         ORDER BY day ASC
     </select>
-    <select id="selectTopOopsTag" resultType="com.devoops.oopslog.achivement.query.dto.TagCountDTO">
+    <select id="selectTopOopsTagByMonth" resultType="com.devoops.oopslog.achivement.query.dto.TagCountDTO">
         SELECT
         t.tag_name AS tag_name,
         COUNT(*) AS tag_count
@@ -33,11 +33,13 @@
         INNER JOIN oops_record o ON ot.oops_id = o.id
         INNER JOIN tag t ON ot.tag_id = t.id
         WHERE o.user_id = #{userId}
+        AND YEAR(o.create_date) = #{year}
+        AND MONTH(o.create_date) = #{month}
         GROUP BY t.id, t.tag_name
         ORDER BY tag_count DESC
         LIMIT 5
     </select>
-    <select id="selectTopOohTag" resultType="com.devoops.oopslog.achivement.query.dto.TagCountDTO">
+    <select id="selectTopOohTagByMonth" resultType="com.devoops.oopslog.achivement.query.dto.TagCountDTO">
         SELECT
         t.tag_name AS tag_name,
         COUNT(*) AS tag_count
@@ -45,6 +47,8 @@
         INNER JOIN ooh_record o ON ot.ooh_id = o.id
         INNER JOIN tag t ON ot.tag_id = t.id
         WHERE o.user_id = #{userId}
+        AND YEAR(o.create_date) = #{year}
+        AND MONTH(o.create_date) = #{month}
         GROUP BY t.id, t.tag_name
         ORDER BY tag_count DESC
         LIMIT 5
@@ -58,5 +62,23 @@
         SELECT COUNT(*) AS ooh_count
         FROM ooh_record
         WHERE user_id = #{userId}
+    </select>
+    <select id="findYearMonthOopsById" resultType="com.devoops.oopslog.achivement.query.dto.FindYearMonthDTO">
+        SELECT
+        DISTINCT
+        YEAR(create_date) AS year,
+        MONTH(create_date) AS month
+        FROM oops_record
+        WHERE user_id = #{userId}
+        ORDER BY year DESC, month DESC
+    </select>
+    <select id="findYearMonthOohById" resultType="com.devoops.oopslog.achivement.query.dto.FindYearMonthDTO">
+        SELECT
+        DISTINCT
+        YEAR(create_date) AS year,
+        MONTH(create_date) AS month
+        FROM ooh_record
+        WHERE user_id = #{userId}
+        ORDER BY year DESC, month DESC
     </select>
 </mapper>

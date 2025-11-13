@@ -1,5 +1,6 @@
 package com.devoops.oopslog.follow.query.service;
 
+import com.devoops.oopslog.follow.query.dto.FollowFeedItemDto;
 import com.devoops.oopslog.follow.query.dto.FollowerResponseDto;
 import com.devoops.oopslog.follow.query.mapper.FollowQueryMapper;
 import lombok.RequiredArgsConstructor;
@@ -30,5 +31,13 @@ public class FollowQueryService {
     @Transactional(readOnly = true)
     public List<FollowerResponseDto> getFollowerList(Long userId) {
         return followQueryMapper.findFollowersByUserId(userId);
+    }
+
+    /**
+     * 팔로잉 피드 조회 서비스 메서드
+     */
+    @Transactional(readOnly = true)
+    public List<FollowFeedItemDto> getFollowingFeed(Long userId) {
+        return followQueryMapper.findFollowingFeedByUserId(userId);
     }
 }

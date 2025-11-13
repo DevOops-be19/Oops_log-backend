@@ -118,6 +118,7 @@ public class AuthenticationFilter extends UsernamePasswordAuthenticationFilter {
         // 로그인 이력 저장
         String ipAddress = getClientIp(request);
         memberCommandService.saveLoginHistory(user.getId(), ipAddress, 'Y');
+
     }
 
 

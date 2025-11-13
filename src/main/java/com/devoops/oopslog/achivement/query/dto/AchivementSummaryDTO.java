@@ -6,9 +6,8 @@ import java.util.List;
 
 @Data
 public class AchivementSummaryDTO {
-    private int oopsCount;
-    private int oohCount;
-
+    private List<OopsRecordCountDTO> OopsRecords;
+    private List<OohRecordCountDTO> OohRecords;
     private List<TagCountDTO> topOopsTags;
     private List<TagCountDTO> topOohTags;
 }

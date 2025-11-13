@@ -1,5 +1,6 @@
 package com.devoops.oopslog.achivement.query.mapper;
 
+import com.devoops.oopslog.achivement.query.dto.FindYearMonthDTO;
 import com.devoops.oopslog.achivement.query.dto.OohRecordCountDTO;
 import com.devoops.oopslog.achivement.query.dto.OopsRecordCountDTO;
 import com.devoops.oopslog.achivement.query.dto.TagCountDTO;
@@ -23,10 +24,21 @@ public interface AchivementReadMapper {
     );
 
     // Oops / Ooh 태그 Top5
-    List<TagCountDTO> selectTopOopsTag(@Param("userId") Long userId);
-    List<TagCountDTO> selectTopOohTag(@Param("userId") Long userId);
+    List<TagCountDTO> selectTopOopsTagByMonth(
+            @Param("userId") Long userId,
+            @Param("year") int year,
+            @Param("month") int month
+    );
+    List<TagCountDTO> selectTopOohTagByMonth(
+            @Param("userId") Long userId,
+            @Param("year") int year,
+            @Param("month") int month
+    );
 
     // Oops / Ooh 게시글 개수
     int countOopsRecord(@Param("userId") Long userId);
     int countOohRecord(@Param("userId") Long userId);
+
+    List<FindYearMonthDTO> findYearMonthOopsById(@Param("userId") Long userId);
+    List<FindYearMonthDTO> findYearMonthOohById(@Param("userId") Long userId);
 }
