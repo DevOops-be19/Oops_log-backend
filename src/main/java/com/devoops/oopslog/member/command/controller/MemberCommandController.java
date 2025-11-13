@@ -24,11 +24,11 @@ public class MemberCommandController {
 
     @GetMapping("/health")
     public String health() {
-        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-        if (authentication instanceof UserImpl) {
-            UserImpl user = (UserImpl) authentication.getPrincipal();
-        }
-        log.info("health {}------------------", authentication.toString());
+//        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+//        if (authentication instanceof UserImpl) {
+//            UserImpl user = (UserImpl) authentication.getPrincipal();
+//        }
+//        log.info("health {}------------------", authentication.toString());
         return "I'm OK.";
     }
 
