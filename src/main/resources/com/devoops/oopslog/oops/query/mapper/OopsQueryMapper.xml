@@ -47,7 +47,7 @@
                 AND B.NAME LIKE CONCAT('%', #{name}, '%')
             </if>
         </where>
-        ORDER BY A.ID DESC
+        ORDER BY  A.CREATE_DATE DESC
         LIMIT #{limit} OFFSET #{offset}
     </select>
 

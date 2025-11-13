@@ -13,7 +13,7 @@ public class AllReportDTO {
     private Long id;
     private Date report_date;
     private String state;
-    private Long category_id;
+    private String category_name;
     private Long user_id;
     private Long ooh_id;
     private Long oops_id;

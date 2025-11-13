@@ -4,8 +4,19 @@
         "https://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.devoops.oopslog.report.query.mapper.ReportReadMapper">
     <select id="selectAllReport" resultType="com.devoops.oopslog.report.query.dto.AllReportDTO">
-        SELECT * FROM report
-        ORDER BY id
+        SELECT
+        r.id,
+        r.report_date,
+        r.state,
+        c.name AS category_name,
+        r.user_id,
+        r.ooh_id,
+        r.oops_id,
+        r.comment_id
+        FROM report r
+        JOIN report_category c
+        ON r.category_id = c.id
+        ORDER BY id DESC
         <if test="limit != null and offset != null">
             LIMIT #{limit} OFFSET #{offset}
         </if>
@@ -26,5 +37,8 @@
         LEFT JOIN comments c
         ON r.comment_id IS NOT NULL AND r.comment_id = c.id
         WHERE r.id = #{reportId}
+    </select>
+    <select id="selectReportCategory" resultType="com.devoops.oopslog.report.query.dto.AllReportCategoryDTO">
+        SELECT * FROM report_category
     </select>
 </mapper>

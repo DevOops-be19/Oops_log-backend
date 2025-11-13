@@ -22,11 +22,16 @@ public class AiService {
     private static final String OPENAI_URL = "https://openrouter.ai/api/v1/chat/completions";
     private static final String MODEL = "gpt-4o-mini";
 
-    @Autowired
-    private AiReadMapper aiReadMapper;
+    private final RestTemplate restTemplate;
+    private final AiReadMapper aiReadMapper;
+
+    public AiService(RestTemplate restTemplate, AiReadMapper aiReadMapper) {
+        this.restTemplate = restTemplate;
+        this.aiReadMapper = aiReadMapper;
+    }
 
     public String getAiFeedback(String content) {
-        RestTemplate rt = new RestTemplate();
+        RestTemplate rt = restTemplate;
 
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(MediaType.APPLICATION_JSON);
@@ -69,7 +74,7 @@ public class AiService {
     }
 
     public String getRelatedEmoTags(String content) {
-        RestTemplate rt = new RestTemplate();
+        RestTemplate rt = restTemplate;
 
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(MediaType.APPLICATION_JSON);

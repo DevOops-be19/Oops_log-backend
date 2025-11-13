@@ -108,25 +108,22 @@ public class ReportServiceImpl implements ReportService {
 
         // 승인(Y) 시 대상 블라인드 처리
         if ("Y".equals(state)) {
-            // oops 게시글일 경우
+            // oops 게시글일 경우 →  DB에서 완전 삭제
             if (report.getOopsId() != null) {
                 OopsCommandEntity oops = report.getOopsId();
-                oops.setOopsIsDeleted("Y");
-                oopsCommandRepository.save(oops);
+                oopsCommandRepository.delete(oops);
             }
 
-            // ooh 게시글일 경우
+            // ooh 게시글일 경우 → DB에서 완전 삭제
             if (report.getOohId() != null) {
                 OohCommandEntity ooh = report.getOohId();
-                ooh.setOohIsDeleted("Y");
-                oohCommandRepository.save(ooh);
+                oohCommandRepository.delete(ooh);
             }
 
-            // 댓글일 경우
+            // 댓글일 경우 → DB에서 완전 삭제
             if (report.getCommentId() != null) {
                 Comments comment = report.getCommentId();
-                comment.setIs_deleted("Y");
-                commentsRepository.save(comment);
+                commentsRepository.delete(comment);
             }
         }
 

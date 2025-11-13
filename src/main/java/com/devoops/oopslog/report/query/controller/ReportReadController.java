@@ -1,6 +1,7 @@
 package com.devoops.oopslog.report.query.controller;
 
 
+import com.devoops.oopslog.report.query.dto.AllReportCategoryDTO;
 import com.devoops.oopslog.report.query.dto.AllReportDTO;
 import com.devoops.oopslog.report.query.dto.ReportDetailDTO;
 import com.devoops.oopslog.report.query.service.ReportReadService;
@@ -37,5 +38,13 @@ public class ReportReadController {
         ReportDetailDTO result = reportReadService.getReportDetailById(reportId);
         return ResponseEntity.ok().body(result);
     }
+
+    @GetMapping("/category")
+    public ResponseEntity<List<AllReportCategoryDTO>> getAllReportCategory() {
+        List<AllReportCategoryDTO> result = reportReadService.selectAllReportCategory();
+        return ResponseEntity.ok().body(result);
+    }
+
+
 
 }

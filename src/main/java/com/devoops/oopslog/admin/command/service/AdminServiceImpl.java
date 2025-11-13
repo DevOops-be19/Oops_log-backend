@@ -1,5 +1,7 @@
 package com.devoops.oopslog.admin.command.service;
 
+import com.devoops.oopslog.member.command.entity.Member;
+import com.devoops.oopslog.member.command.repository.MemberCommandRepository;
 import com.devoops.oopslog.tag.command.entity.Tag;
 import com.devoops.oopslog.tag.command.repository.TagRepository;
 import jakarta.transaction.Transactional;
@@ -10,15 +12,17 @@ import java.util.List;
 
 @Service
 @Transactional
-public class AdminTagServiceImpl implements AdminTagService {
+public class AdminServiceImpl implements AdminService {
     private final TagRepository tagRepository;
+    private final MemberCommandRepository memberRepository;
 
     // 허용 가능한 태그 타입 목록
     private static final List<String> ALLOWED_TAG_TYPES = List.of("ooh", "oops", "emo");
 
     @Autowired
-    public AdminTagServiceImpl(TagRepository tagRepository) {
+    public AdminServiceImpl(TagRepository tagRepository, MemberCommandRepository memberRepository) {
         this.tagRepository = tagRepository;
+        this.memberRepository = memberRepository;
     }
 
     @Override
@@ -56,4 +60,19 @@ public class AdminTagServiceImpl implements AdminTagService {
             throw new IllegalArgumentException("해당 ID의 태그가 존재하지 않습니다: " + tagId);
         }
     }
+
+    @Override
+    public Member updateStateMember(Long id, Character state) {
+        // 회원 조회
+        Member member = memberRepository.findById(id)
+                .orElseThrow(() -> new IllegalArgumentException("해당 회원이 존재하지 않습니다. ID = " + id));
+
+        // 상태 변경
+        member.setUser_state(state);  // 예: ACTIVE, BAN, STOP 등
+
+        // 저장 후 반환
+        return memberRepository.save(member);
+    }
+
+
 }

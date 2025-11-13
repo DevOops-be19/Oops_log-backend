@@ -1,5 +1,6 @@
 package com.devoops.oopslog.report.query.service;
 
+import com.devoops.oopslog.report.query.dto.AllReportCategoryDTO;
 import com.devoops.oopslog.report.query.dto.AllReportDTO;
 import com.devoops.oopslog.report.query.dto.ReportDetailDTO;
 import com.devoops.oopslog.report.query.mapper.ReportReadMapper;
@@ -27,6 +28,11 @@ public class ReportReadServiceImpl implements ReportReadService {
     @Override
     public ReportDetailDTO getReportDetailById(Long reportId) {
         return reportReadMapper.selectReportDetail(reportId);
+    }
+
+    @Override
+    public List<AllReportCategoryDTO> selectAllReportCategory() {
+        return reportReadMapper.selectReportCategory();
     }
 
 }
