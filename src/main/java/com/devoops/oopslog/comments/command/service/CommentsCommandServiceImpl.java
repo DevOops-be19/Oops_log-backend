@@ -22,8 +22,7 @@ public class CommentsCommandServiceImpl implements CommentsCommandService {
         this.commentsRepository = commentsRepository;
         this.modelMapper = modelMapper;
     }
-
-
+    
     @Override
     @Transactional
     public String registOopsComment(CommentCommandDTO newComment, int oopsId, long userId) {
