@@ -3,6 +3,10 @@ package com.devoops.oopslog.comments.command.service;
 import com.devoops.oopslog.comments.command.dto.CommentCommandDTO;
 import com.devoops.oopslog.comments.command.entity.Comments;
 import com.devoops.oopslog.comments.command.repository.CommentsRepository;
+import com.devoops.oopslog.ooh.command.entity.OohCommandEntity;
+import com.devoops.oopslog.ooh.command.repository.OohCommandRepository;
+import com.devoops.oopslog.oops.command.entity.OopsCommandEntity;
+import com.devoops.oopslog.oops.command.repository.OopsCommandRepository;
 import jakarta.transaction.Transactional;
 import lombok.extern.slf4j.Slf4j;
 import org.modelmapper.ModelMapper;
@@ -16,12 +20,19 @@ import java.time.LocalDateTime;
 public class CommentsCommandServiceImpl implements CommentsCommandService {
     private final CommentsRepository commentsRepository;
     private final ModelMapper modelMapper;
+    private final OopsCommandRepository oopsCommandRepository;
+    private final OohCommandRepository oohCommandRepository;
 
     @Autowired
-    public CommentsCommandServiceImpl(CommentsRepository commentsRepository, ModelMapper modelMapper) {
+    public CommentsCommandServiceImpl(CommentsRepository commentsRepository, ModelMapper modelMapper,
+                                      OopsCommandRepository oopsCommandRepository,
+                                      OohCommandRepository oohCommandRepository) {
         this.commentsRepository = commentsRepository;
         this.modelMapper = modelMapper;
+        this.oopsCommandRepository = oopsCommandRepository;
+        this.oohCommandRepository = oohCommandRepository;
     }
+
 
     @Override
     @Transactional
@@ -34,7 +45,10 @@ public class CommentsCommandServiceImpl implements CommentsCommandService {
         comments.setOops_id((long)oopsId);
 
         commentsRepository.save(comments);
-        return "oops comment write success";
+
+        OopsCommandEntity oopsCommandEntity =  oopsCommandRepository.findById((long)oopsId).get();
+
+        return oopsCommandEntity.getOopsUserId()+","+oopsCommandEntity.getOopsTitle();
     }
 
     @Override
@@ -47,7 +61,10 @@ public class CommentsCommandServiceImpl implements CommentsCommandService {
         comments.setOoh_id((long)oohId);
 
         commentsRepository.save(comments);
-        return "ooh comment write success";
+
+        OohCommandEntity oohCommandEntity =  oohCommandRepository.findById((long)oohId).get();
+
+        return oohCommandEntity.getOohUserId()+","+oohCommandEntity.getOohTitle();
     }
 
     @Override

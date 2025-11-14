@@ -2,20 +2,29 @@ package com.devoops.oopslog.comments.command.controller;
 
 import com.devoops.oopslog.comments.command.dto.CommentCommandDTO;
 import com.devoops.oopslog.comments.command.service.CommentsCommandService;
+import com.devoops.oopslog.common.SseService;
 import com.devoops.oopslog.member.command.dto.UserImpl;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.scheduling.annotation.Async;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.StringTokenizer;
+
 @RestController
 @RequestMapping("/comments")
+@Slf4j
 public class CommentsCommandController {
     private final CommentsCommandService commentsCommandService;
+    private final SseService sseService;
 
     @Autowired
-    public CommentsCommandController(CommentsCommandService commentsCommandService) {
+    public CommentsCommandController(CommentsCommandService commentsCommandService,
+                                     SseService sseService) {
         this.commentsCommandService = commentsCommandService;
+        this.sseService = sseService;
     }
 
     @PostMapping("/oops-insert/{oops_id}")
@@ -32,13 +41,21 @@ public class CommentsCommandController {
         long userId = userImpl.getId();
 //        long userId = 20;   // 임시값 지정
         String result = commentsCommandService.registOopsComment(newComment, oops_id, userId);
+        StringTokenizer st = new StringTokenizer(result,",");
 
-        return result;
+        try{
+            sseService.sseSend(Long.parseLong(st.nextToken()),st.nextToken());
+
+        }catch(Exception e){
+            log.info("해당 회원 접속 안함");
+        }
+
+        return "oops comments complete";
     }
 
     @PostMapping("/ooh-insert/{ooh_id}")
     public String writeCommentAtOoh(@RequestBody CommentCommandDTO newComment,
-                                     @PathVariable int ooh_id){
+                                    @PathVariable int ooh_id){
 
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         if(!(authentication.getPrincipal() instanceof UserImpl)){
@@ -51,8 +68,16 @@ public class CommentsCommandController {
 
 //        long userId = 20;   // 임시값 지정
         String result = commentsCommandService.registOohComment(newComment, ooh_id, userId);
+        StringTokenizer st = new StringTokenizer(result,",");
 
-        return result;
+        try{
+            sseService.sseSend(Long.parseLong(st.nextToken()),st.nextToken());
+
+        }catch(Exception e){
+            log.info("해당 회원 접속 안함");
+        }
+
+        return "ooh comments complete";
     }
 
     @PostMapping("/notice-insert/{notice_id}")
