@@ -6,7 +6,6 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
 
 import java.io.IOException;
-import java.util.Map;
 
 @Service
 @Slf4j
@@ -52,9 +51,7 @@ public class SseService {
         if (emitter == null) return;
 
         try {
-            emitter.send(SseEmitter.event().data(
-                    Map.of("message", "\""+message+"\" 게시물에 댓글이 달렸습니다.")
-            ));
+            emitter.send(SseEmitter.event().data(message));
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
