@@ -5,6 +5,7 @@ import jakarta.persistence.*;
 import lombok.*;
 
 import java.time.LocalDateTime;
+import java.time.ZoneId;
 
 @Entity
 @Table(name = "notice_board")
@@ -47,13 +48,13 @@ public class NoticeCommandEntity {
     // PrePersist LocalDateTime 때문에
     @PrePersist
     public void prePersist() {
-        this.noticeCreateDate = LocalDateTime.now();
+        this.noticeCreateDate = LocalDateTime.now(ZoneId.of("Asia/Seoul"));
         this.noticeModifyDate = this.noticeCreateDate;
         if (this.noticeIsDeleted == null) this.noticeIsDeleted = "N";
     }
 
     @PreUpdate
     public void preUpdate() {
-        this.noticeModifyDate = LocalDateTime.now();
+        this.noticeModifyDate = LocalDateTime.now(ZoneId.of("Asia/Seoul"));
     }
 }

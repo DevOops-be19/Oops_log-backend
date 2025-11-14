@@ -8,6 +8,7 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 import java.time.LocalDateTime;
+import java.time.ZoneId;
 
 @Entity
 @Table(name = "oops_record")
@@ -64,7 +65,7 @@ public class OopsCommandEntity {
     // PrePersist LocalDateTime 때문에
     @PrePersist
     public void prePersist() {
-        this.oopsCreateDate = LocalDateTime.now();
+        this.oopsCreateDate = LocalDateTime.now(ZoneId.of("Asia/Seoul"));
         this.oopsModifyDate = this.oopsCreateDate;
         if (this.oopsIsDeleted == null) this.oopsIsDeleted = "N";
         if (this.oopsIsPrivate == null) this.oopsIsPrivate = "N";
@@ -72,7 +73,7 @@ public class OopsCommandEntity {
 
     @PreUpdate
     public void preUpdate() {
-        this.oopsModifyDate = LocalDateTime.now();
+        this.oopsModifyDate = LocalDateTime.now(ZoneId.of("Asia/Seoul"));
     }
 
 

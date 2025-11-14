@@ -9,6 +9,7 @@ import lombok.Setter;
 
 import java.sql.Date;
 import java.time.LocalDateTime;
+import java.time.ZoneId;
 
 @Entity
 @Table(name = "ooh_record")
@@ -65,7 +66,7 @@ public class OohCommandEntity {
     // PrePersist LocalDateTime 때문에
     @PrePersist
     public void prePersist() {
-        this.oohCreateDate = LocalDateTime.now();
+        this.oohCreateDate = LocalDateTime.now(ZoneId.of("Asia/Seoul"));
         this.oohModifyDate = this.oohCreateDate;
         if (this.oohIsDeleted == null) this.oohIsDeleted = "N";
         if (this.oohIsPrivate == null) this.oohIsPrivate = "N";
@@ -73,7 +74,7 @@ public class OohCommandEntity {
 
     @PreUpdate
     public void preUpdate() {
-        this.oohModifyDate = LocalDateTime.now();
+        this.oohModifyDate = LocalDateTime.now(ZoneId.of("Asia/Seoul"));
     }
 
 }
