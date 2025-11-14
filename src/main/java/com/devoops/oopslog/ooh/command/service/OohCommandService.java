@@ -51,6 +51,7 @@ public class OohCommandService {
             throw new IllegalArgumentException("존재하지 않는 사용자입니다: " + oohCommandCreateDTO.getOohUserId());
         }
 
+        
         // 저장할 정보 및 body에 담을 것
         OohCommandEntity entity = new OohCommandEntity();
         entity.setOohUserId(oohCommandCreateDTO.getOohUserId());
